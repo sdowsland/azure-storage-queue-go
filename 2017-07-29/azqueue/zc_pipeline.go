@@ -1,11 +1,12 @@
 package azqueue
 
 import (
-	"github.com/Azure/azure-pipeline-go/pipeline"
 	"context"
-	"net/http"
 	"net"
+	"net/http"
 	"time"
+
+	"github.com/Azure/azure-pipeline-go/pipeline"
 	//"net/url"
 	//"log"
 )
@@ -68,7 +69,7 @@ func newDefaultHTTPClient() *http.Client {
 				DualStack: true,
 			}).Dial, /*Context*/
 			MaxIdleConns:           0, // No limit
-			MaxIdleConnsPerHost:    100,
+			MaxIdleConnsPerHost:    1000,
 			IdleConnTimeout:        90 * time.Second,
 			TLSHandshakeTimeout:    10 * time.Second,
 			ExpectContinueTimeout:  1 * time.Second,
@@ -80,7 +81,6 @@ func newDefaultHTTPClient() *http.Client {
 		},
 	}
 }
-
 
 func newDefaultHTTPClientFactory() pipeline.Factory {
 	return pipeline.FactoryFunc(func(next pipeline.Policy, po *pipeline.PolicyOptions) pipeline.PolicyFunc {

@@ -81,7 +81,7 @@ func (m MessagesURL) Enqueue(ctx context.Context, messageText string, visibility
 	ttl := int32(timeToLive.Seconds())
 	er, err := m.client.Enqueue(ctx, QueueMessage{MessageText: messageText}, &vt, &ttl, nil, nil)
 
-	if len(er.Items) > 0 {
+	if er != nil && len(er.Items) > 0 {
 		item := er.Items[0]
 		return &EnqueueMessageResponse{
 			inner:           er,
