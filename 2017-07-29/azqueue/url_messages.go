@@ -5,8 +5,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Azure/azure-pipeline-go/pipeline"
 	"net/http"
+
+	"github.com/Azure/azure-pipeline-go/pipeline"
 )
 
 // MessageID represents a Message ID as a string.
@@ -79,23 +80,28 @@ func (m MessagesURL) Enqueue(ctx context.Context, messageText string, visibility
 	vt := int32(visibilityTimeout.Seconds())
 	ttl := int32(timeToLive.Seconds())
 	er, err := m.client.Enqueue(ctx, QueueMessage{MessageText: messageText}, &vt, &ttl, nil, nil)
-	item := er.Items[0]
-	return &EnqueueMessageResponse{
-		inner: er,
-		MessageID:MessageID(item.MessageID),
-		PopReceipt:PopReceipt(item.PopReceipt),
-		TimeNextVisible:item.TimeNextVisible,
-		InsertionTime:item.InsertionTime,
-		ExpirationTime:item.ExpirationTime,
-	}, err
+
+	if len(er.Items) > 0 {
+		item := er.Items[0]
+		return &EnqueueMessageResponse{
+			inner:           er,
+			MessageID:       MessageID(item.MessageID),
+			PopReceipt:      PopReceipt(item.PopReceipt),
+			TimeNextVisible: item.TimeNextVisible,
+			InsertionTime:   item.InsertionTime,
+			ExpirationTime:  item.ExpirationTime,
+		}, err
+	} else {
+		return nil, err
+	}
 }
 
 // EnqueueMessageResponse holds the results of a successfully-enqueued message.
 type EnqueueMessageResponse struct {
-	inner      *EnqueueResponse
+	inner *EnqueueResponse
 
 	// MessageID returns the service-assigned ID for the enqueued message.
-	MessageID  MessageID
+	MessageID MessageID
 
 	// PopReceipt returns the service-assigned PopReceipt for the enqueued message.
 	// You could use this to create a MessageIDURL object.
